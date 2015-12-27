@@ -48,8 +48,14 @@ Required context:
             "action_name": "shared_lib",
             "inputs": ["<(static_lib)"],
             "outputs": ["../<(shared_lib)"],
-            # FIXME: OSX-specific
-            "action": ["gcc", "-dynamiclib", "-Wl,-undefined,dynamic_lookup", "-Wl,-force_load,<(static_lib)", "-o", "<(shared_lib)"]
+            "conditions": [
+              ["OS=='linux'", {
+                "action": ["ld", "-shared", "--whole-archive", "<(static_lib)", "-o", "<(shared_lib)"]
+              }],
+              ["OS=='mac'",{
+                "action": ["gcc", "-dynamiclib", "-Wl,-undefined,dynamic_lookup", "-Wl,-force_load,<(static_lib)", "-o", "<(shared_lib)"]
+              }]
+            ]
         }, {
             "action_name": "generate",
             "inputs": [],
